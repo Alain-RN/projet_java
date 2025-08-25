@@ -8,15 +8,13 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);
 }
 
-AnchorPane {
-    -fx-background-color: linear-gradient(to bottom right, #f5f7fa, #c3cfe2);
-}
 
 .form-title {
     -fx-font-size: 36px;
     -fx-font-weight: bold;
     -fx-text-fill: #2c3e50;
     -fx-alignment: center;
+    -fx-padding : 30 0 4 0;
 }
 
 .form-input {
@@ -78,7 +76,6 @@ AnchorPane {
 .link-button:hover {
     -fx-text-fill: #2980b9;
 }
-
 
 
 .error-message {

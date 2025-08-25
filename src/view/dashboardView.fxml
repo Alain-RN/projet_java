@@ -1,16 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.DashboardController"
-            prefHeight="400.0" prefWidth="600.0">
+            >
+
+    <!-- Sidebar -->
+    <VBox fx:id="sidebar"
+          spacing="14"
+          styleClass="sidebar"
+          prefWidth="240"
+          AnchorPane.topAnchor="80"
+          AnchorPane.bottomAnchor="20"
+          AnchorPane.leftAnchor="20"
+    >
+        <HBox alignment="CENTER_LEFT" styleClass="search-parking-container" >
+            <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                <image>
+                    <Image url="@../images/search.png"/>
+                </image>
+            </ImageView>
+            <TextField fx:id="searchParking" promptText="Rechercher parking..." styleClass="search-bar-parking" HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <!-- Creer un parking-->
+        <Button fx:id="addParking"
+                styleClass="addParking"
+                text="Nouveau parking"
+                HBox.hgrow="ALWAYS"
+                maxWidth="Infinity"
+                graphicTextGap="10"
+        >
+                <graphic>
+                    <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true">
+                        <image>
+                            <Image url="@/images/plus.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+        </Button>
 
 
+        <ScrollPane
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="NEVER"
+                    pannable="true"
+                    fx:id="scrollPane"
+                    VBox.vgrow="ALWAYS">
+
+            <content>
+                <VBox spacing="10" fx:id="buttonContainer">
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                    <Button text="AAAAA"/>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <VBox spacing="14" >
+            <HBox>
+                <Label text="User"/>
+            </HBox>
+            <Button fx:id="logoutBtn" text="Se deconnecter"/>
+        </VBox>
+    </VBox>
+
+    <!-- Header -->
+    <HBox fx:id="header"
+          spacing="10"
+          alignment="CENTER"
+          AnchorPane.topAnchor="20"
+          AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20"
+          styleClass="header"
+    >
+
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <ImageView fx:id="logoImage"
+                       fitHeight="40"
+                       fitWidth="40"
+                       preserveRatio="true"
+                       pickOnBounds="true"
+            >
+                <image>
+                    <Image url="@../images/logo.png"/>
+                </image>
+            </ImageView>
+            <Label text="Parking" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+        </HBox>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <HBox spacing="1" alignment="CENTER_LEFT" styleClass="search-container" >
+            <ImageView fitHeight="26" fitWidth="26" preserveRatio="true">
+                <image>
+                    <Image url="@../images/search.png"/>
+                </image>
+            </ImageView>
+            <TextField fx:id="searchBar" promptText="Rechercher..." styleClass="search-bar"/>
+        </HBox>
+    </HBox>
 
 </AnchorPane>
+
+

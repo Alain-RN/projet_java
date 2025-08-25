@@ -9,13 +9,13 @@
 <AnchorPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controllers.LoginController"
-            stylesheets="@../style/form.css">
+            >
 
     <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-               >
+                >
 
-        <VBox spacing="24" maxWidth="380" maxHeight="500" styleClass="form-container" alignment="CENTER">
+        <VBox spacing="24" maxWidth="380" maxHeight="460" styleClass="form-container" alignment="CENTER" fx:id="formContainer">
 
             <!-- Titre -->
             <Label text="Connexion" styleClass="form-title"/>
@@ -29,7 +29,7 @@
                            maxWidth="300" styleClass="form-input"/>
 
             <!-- Bouton principal + lien -->
-            <VBox spacing="24" alignment="CENTER" styleClass="btn-box">
+            <VBox spacing="20" alignment="CENTER" styleClass="btn-box">
 
                 <!-- Bouton principal -->
                 <Button text="Se connecter" fx:id="loginButton"
@@ -43,7 +43,7 @@
 
                 <!-- Ligne lien vers inscription -->
                 <HBox spacing="5" alignment="CENTER">
-                    <Label text="Pas de compte ?" styleClass="info-label"/>
+                    <Label text="Pas encore de compte ?" styleClass="info-label"/>
                     <Button text="S'inscrire" fx:id="goRegisterButton"
                             styleClass="link-button"/>
                 </HBox>

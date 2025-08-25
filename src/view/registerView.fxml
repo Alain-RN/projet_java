@@ -11,9 +11,9 @@
 
     <StackPane AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
                AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-               alignment="CENTER">
+               >
 
-        <VBox spacing="24" maxWidth="380" maxHeight="640" styleClass="form-container" alignment="CENTER">
+        <VBox spacing="24" maxWidth="380" maxHeight="600" styleClass="form-container" alignment="CENTER" fx:id="formContainer">
 
             <!-- Titre -->
             <Label text="Inscription" styleClass="form-title"/>
@@ -35,10 +35,10 @@
                            maxWidth="300" styleClass="form-input"/>
 
             <!-- Boutons -->
-            <VBox spacing="24" alignment="CENTER" styleClass="btn-box">
+            <VBox spacing="20" alignment="CENTER" styleClass="btn-box">
 
                 <!-- Bouton principal -->
-                <Button text="Se connecter" fx:id="loginButton"
+                <Button text="S'inscrire" fx:id="registerButton"
                         prefWidth="300" styleClass="form-button"/>
 
                 <HBox alignment="CENTER" spacing="8" maxWidth="300">
