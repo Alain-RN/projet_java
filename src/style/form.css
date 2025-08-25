@@ -1,0 +1,87 @@
+.form-container {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #dcdde1;
+    -fx-border-width: 1.5;
+    -fx-padding: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);
+}
+
+AnchorPane {
+    -fx-background-color: linear-gradient(to bottom right, #f5f7fa, #c3cfe2);
+}
+
+.form-title {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-alignment: center;
+}
+
+.form-input {
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #bdc3c7;
+    -fx-background-color: white;
+}
+
+.form-input:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(three-pass-box, rgba(52,152,219,0.3), 6, 0, 0, 0);
+}
+
+.btn-box {
+    -fx-padding: 6 0 0 0;
+}
+
+
+.form-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 10px;
+}
+
+
+.form-button-secondary {
+    -fx-background-color: #95a5a6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 10px;
+}
+
+/* Label léger pour infos */
+.info-label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 14px;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3498db;
+    -fx-underline: true;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.link-button:hover {
+    -fx-text-fill: #2980b9;
+}
+
+
+
+.error-message {
+    -fx-text-fill: red;
+    -fx-font-size: 13px;
+}
