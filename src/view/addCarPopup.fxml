@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controllers.AddCarController"
+      spacing="15"
+      alignment="CENTER"
+      prefWidth="350"
+      prefHeight="350"
+      styleClass="popup-container"
+      stylesheets="@/style/popup.css">
+
+    <!-- Titre -->
+    <Label text="Ajouter une Voiture" styleClass="popup-title" fx:id="titleAddCar"/>
+
+    <!-- Champs de saisie -->
+    <TextField fx:id="carPlateField" promptText="Numéro d'immatriculation"/>
+    <TextField fx:id="carOwnerField" promptText="Propriétaire"/>
+
+    <!-- Temps de stationnement -->
+    <HBox spacing="5" alignment="CENTER">
+        <Button fx:id="decreaseTimeBtn" text="–" styleClass="time-btn" onAction="#decrTime"/>
+        <TextField fx:id="parkingTimeField" promptText="Durée (minutes)" styleClass="text-field"/>
+        <Button fx:id="increaseTimeBtn" text="+" styleClass="time-btn" onAction="#incrTime"/>
+    </HBox>
+
+    <!-- Boutons -->
+    <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+        <Button text="Enregistrer" fx:id="saveBtn" styleClass="save-btn"/>
+        <Button text="Annuler" fx:id="cancelBtn" styleClass="cancel-btn"/>
+    </HBox>
+</VBox>
+

@@ -1,23 +1,29 @@
 package controllers;
 
-
+import dao.UserDAO;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import models.User;
 import app.MainApp;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import utils.Session;
+
 
 public class LoginController {
 
-    public MainApp mainApp;
-    public TextField emailField;
-    public PasswordField passwordField;
-    public Label loginMessage;
+    private MainApp mainApp;
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
+
+    @FXML
+    private TextField emailField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private Label loginMessage;
 
     @FXML
     private Button goRegisterButton;
@@ -26,17 +32,38 @@ public class LoginController {
     private Button loginButton;
 
     @FXML
-    public void initialize() {
+    private void login() {
+        String email = emailField.getText().trim();
+        String password = passwordField.getText().trim();
 
-        loginButton.setOnAction(e -> {
-            if ("".equals(emailField.getText()) && "".equals(passwordField.getText())) {
+        if(email.isEmpty() || password.isEmpty()) {
+            loginMessage.setText("Veuillez remplir tous les champs !");
+            return;
+        }
+
+        if(!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            loginButton.setText("Email invalide !");
+            return;
+        }
+
+        try {
+            User user = new UserDAO().authenticate(email, password);
+            if (user != null) {
+                Session.setUser(user);
+                loginMessage.setText("");
                 mainApp.showDashboard();
             } else {
-                loginMessage.setText("Email ou mot de passe incorrect");
+                loginMessage.setText("Email ou mot de passe incorrect !");
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+            loginMessage.setText("Impossible de se connecter à la base de données !");
+        }
+    }
 
-        goRegisterButton.setOnAction(e -> mainApp.showRegister());
+    @FXML
+    private void goRegister() {
+        // Ouvrir la fenêtre d'inscription
+        mainApp.showRegister();
     }
 }
-

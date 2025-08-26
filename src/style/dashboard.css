@@ -42,11 +42,35 @@
     -fx-font-size: 13px;
 }
 
+.logout-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-padding: 8 12;
+}
+
+/* Avatar user */
+.user-avatar {
+    -fx-background-color: #3498db;
+    -fx-background-radius: 50%;
+    -fx-alignment: center;
+}
+
+/* Initiale */
+.user-initial {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+
 .addParking {
     -fx-background-color: #3498db;
     -fx-background-radius: 6;
-    -fx-padding: 7 0 7 0;
     -fx-border-radius: 6;
+    -fx-padding: 7 0 7 0;
     -fx-text-fill: white;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
@@ -66,4 +90,64 @@
     -fx-padding: 0;
     -fx-background-color: transparent;
 }
+
+
+.parking-data-header {
+     -fx-padding : 20;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: #ffffff;
+}
+
+.h1 {
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+}
+
+
+.data-block {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding:12;
+    -fx-pref-width: 200;
+}
+
+
+.parking-information-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #555;
+    -fx-font-weight: bold;
+}
+
+.number {
+    -fx-font-size: 42px;
+    -fx-text-fill: #3498db;
+    -fx-font-weight: bold;
+}
+
+#listCar {
+    -fx-padding:20;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: #ffffff;
+}
+
+#addCarBtn {
+    -fx-background-color: #3498db;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 8 14 8 14;
+}
+
+.car-list-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+}
+
+
 

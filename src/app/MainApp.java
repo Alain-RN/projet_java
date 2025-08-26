@@ -87,7 +87,8 @@ public class MainApp extends Application {
     }
 
     public void showDashboard() {
-         primaryStage.getScene().setRoot(dashboardRoot);
+        dashboardController.loadUser();
+        primaryStage.getScene().setRoot(dashboardRoot);
     }
 
 

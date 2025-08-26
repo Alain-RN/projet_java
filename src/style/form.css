@@ -31,6 +31,11 @@
     -fx-effect: dropshadow(three-pass-box, rgba(52,152,219,0.3), 6, 0, 0, 0);
 }
 
+.form-input:error {
+    -fx-border-color: #e74c3c;
+    -fx-border-width: 1;
+}
+
 .btn-box {
     -fx-padding: 6 0 0 0;
 }

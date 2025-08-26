@@ -37,9 +37,12 @@
             <!-- Boutons -->
             <VBox spacing="20" alignment="CENTER" styleClass="btn-box">
 
-                <!-- Bouton principal -->
-                <Button text="S'inscrire" fx:id="registerButton"
-                        prefWidth="300" styleClass="form-button"/>
+                <!-- Bouton d'inscription -->
+                <Button text="S'inscrire"
+                        fx:id="registerButton"
+                        prefWidth="300" styleClass="form-button"
+                        onAction="#register"
+                />
 
                 <HBox alignment="CENTER" spacing="8" maxWidth="300">
                     <Separator HBox.hgrow="ALWAYS"/>

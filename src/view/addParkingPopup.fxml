@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controllers.AddParkingController"
+      spacing="15"
+      alignment="CENTER"
+      prefWidth="350"
+      prefHeight="250"
+      styleClass="popup-container"
+      stylesheets="@/style/popup.css"
+>
+
+    <Label text="Ajouter un Parking" styleClass="popup-title"/>
+
+    <TextField fx:id="parkingNameField" promptText="Nom du parking"/>
+    <TextField fx:id="parkingLocationField" promptText="Localisation"/>
+    <TextField fx:id="parkingCapacityField" promptText="Capacité(minimum :5)" />
+
+    <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+        <Button text="Enregistrer" fx:id="saveBtn" styleClass="save-btn" onAction="#addParking"/>
+        <Button text="Annuler" fx:id="cancelBtn" styleClass="cancel-btn"/>
+    </HBox>
+</VBox>
