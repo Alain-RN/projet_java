@@ -80,6 +80,24 @@ public class CarDAO {
         return cars;
     }
 
+    // Mettre a jour les données des voiture
+    public void updateCar(Car car) {
+        String sql = "UPDATE cars SET plate = ?, owner_email = ?, duration = ?, parking_id = ? WHERE id = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, car.getPlate());
+            stmt.setString(2, car.getOwnerEmail());
+            stmt.setInt(3, car.getDuration());
+            stmt.setInt(4, car.getParkingId());
+            stmt.setInt(5, car.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Supprimer une voiture
     public void deleteCar(int id) {
         String sql = "DELETE FROM cars WHERE id = ?";

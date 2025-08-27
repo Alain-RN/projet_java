@@ -78,7 +78,7 @@ public class RegisterController {
             Session.setUser(user);
 
             // Rediriger vers le dashboard
-            mainApp.showDashboard();
+            mainApp.showDashboard(Session.getUser());
 
         } catch (Exception e) {
             e.printStackTrace();

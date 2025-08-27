@@ -7,7 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,6 +30,7 @@ import dao.ParkingDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class DashboardController {
 
@@ -52,6 +55,7 @@ public class DashboardController {
     }
 
     public void initialize() {
+        loadUser();
         loadParkings();
         loadCars();
     }
@@ -119,8 +123,8 @@ public class DashboardController {
         }
     }
 
-    public void loadUser() {
-        user = Session.getUser();
+    public User loadUser() {
+        this.user = Session.getUser();
         if (user != null) {
             String initial = user.getUsername().substring(0, 1).toUpperCase();
             userInitial.setText(initial);
@@ -134,7 +138,13 @@ public class DashboardController {
                 addParking.setVisible(false);
                 addParking.setManaged(false);
             }
+
+            buttonContainer.getChildren().removeIf(node ->
+                    node instanceof Button && node.getStyleClass().contains("delete-button")
+            );
+
         }
+        return this.user;
     }
 
     private boolean isAdmin(User user) {
@@ -161,6 +171,8 @@ public class DashboardController {
                 showParkingDetails(parkings.get(0), totalCar);
             }
 
+
+
             for (Parking parking : parkings) {
                 // Conteneur horizontal pour le nom + bouton delete
                 HBox parkingRow = new HBox(10);
@@ -170,7 +182,7 @@ public class DashboardController {
                 // Label du parking
                 Label parkingLabel = new Label(parking.getName() + " (" + parking.getCapacity() + " places)");
                 parkingLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #333; -fx-font-weight: bold;");
-//                System.out.print(user.getEmail());
+
 
                 // Bouton delete avec image
                 Button deleteButton = new Button();
@@ -182,18 +194,13 @@ public class DashboardController {
                 );
 
                 ImageView deleteIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/delete.png")));
-                deleteIcon.setFitHeight(12);
-                deleteIcon.setFitWidth(12);
+                deleteIcon.setFitHeight(10);
+                deleteIcon.setFitWidth(10);
                 deleteButton.setGraphic(deleteIcon);
 
                 // Action clic sur bouton delete
                 deleteButton.setOnAction(e -> {
-                    try {
-                        parkingDAO.deleteParking(parking.getId());
-                        buttonContainer.getChildren().remove(parkingRow);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                    showDeleteParkingPopup(parking, parkingDAO);
                 });
 
                 // Clic sur le label = afficher détails
@@ -208,7 +215,11 @@ public class DashboardController {
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                parkingRow.getChildren().addAll(parkingLabel, spacer, deleteButton);
+                if( user != null && isAdmin(user)) {
+                    parkingRow.getChildren().addAll(parkingLabel, spacer, deleteButton);
+                } else {
+                    parkingRow.getChildren().addAll(parkingLabel, spacer);
+                }
 
                 // Ajouter la ligne dans le container
                 buttonContainer.getChildren().add(parkingRow);
@@ -288,7 +299,7 @@ public class DashboardController {
                 editBtn.setGraphic(editIcon);
                 editBtn.setStyle("-fx-background-color: transparent;");
                 editBtn.setOnAction(e -> {
-                    // action pour modifier la voiture
+                    showEditCarPopup(car, carDAO);
                 });
 
                 // Bouton Supprimer
@@ -299,7 +310,7 @@ public class DashboardController {
                 deleteBtn.setGraphic(deleteIcon);
                 deleteBtn.setStyle("-fx-background-color: transparent;");
                 deleteBtn.setOnAction(e -> {
-                    // action pour supprimer la voiture
+                    showDeleteCarPopup(car, carDAO);
                 });
 
                 Region spacer = new Region();
@@ -321,5 +332,226 @@ public class DashboardController {
 
     public User getUser() {
         return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
+    /**
+     * Affiche un popup pour modifier les informations d'une voiture.
+     *
+     * @param parking La voiture à supprimer
+     * @param parkingDAO L'objet DAO du ParkingDAO
+     */
+    private void showDeleteParkingPopup(Parking parking, ParkingDAO parkingDAO) {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+
+        VBox root = new VBox(20);
+        root.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-padding: 20;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-border-color: #ccc;" +
+                        "-fx-border-radius: 10;" +
+                        "-fx-border-width: 1;"
+        );
+        root.setAlignment(Pos.CENTER);
+
+        Label message = new Label("Voulez-vous vraiment supprimer le parking \"" + parking.getName() + "\" ?");
+        message.setStyle("-fx-font-size: 14px; -fx-text-fill: #333; -fx-font-weight: bold;");
+        message.setWrapText(true);
+        message.setMaxWidth(250);
+
+        HBox buttons = new HBox(20);
+        buttons.setAlignment(Pos.CENTER);
+
+        Button btnYes = new Button("Oui");
+        btnYes.setStyle(
+                "-fx-background-color: #ff4d4f;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 5;" +
+                        "-fx-padding: 5 15;"
+        );
+
+        Button btnNo = new Button("Non");
+        btnNo.setStyle(
+                "-fx-background-color: #ccc;" +
+                        "-fx-text-fill: #333;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 5;" +
+                        "-fx-padding: 5 15;"
+        );
+
+        buttons.getChildren().addAll(btnYes, btnNo);
+        root.getChildren().addAll(message, buttons);
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popupStage.setScene(scene);
+        popupStage.setResizable(false);
+
+        // Actions boutons
+        btnYes.setOnAction(ev -> {
+            try {
+                parkingDAO.deleteParking(parking.getId());
+                loadParkings();
+                loadCars();
+                popupStage.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnNo.setOnAction(ev -> popupStage.close());
+
+        popupStage.showAndWait();
+    }
+
+
+    /**
+     * Affiche un popup pour modifier les informations d'une voiture.
+     *
+     * @param car La voiture à modifier
+     * @param carDAO L'objet DAO pour effectuer la mise à jour
+     */
+    private void showEditCarPopup(Car car, CarDAO carDAO) {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+
+        VBox root = new VBox(15);
+        root.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-padding: 20;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-border-color: #ccc;" +
+                        "-fx-border-radius: 10;" +
+                        "-fx-border-width: 1;"
+        );
+
+        root.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Modifier la voiture");
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
+
+        // Champs
+        Label plateLabel = new Label("Plaque :");
+        javafx.scene.control.TextField plateField = new javafx.scene.control.TextField(car.getPlate());
+
+        Label ownerLabel = new Label("Propriétaire :");
+        javafx.scene.control.TextField ownerField = new javafx.scene.control.TextField(car.getOwnerEmail());
+
+        Label durationLabel = new Label("Durée (min) :");
+        javafx.scene.control.TextField durationField = new javafx.scene.control.TextField(String.valueOf(car.getDuration()));
+
+        VBox fields = new VBox(10, plateLabel, plateField, ownerLabel, ownerField, durationLabel, durationField);
+
+        fields.setMaxWidth(300);
+
+        HBox buttons = new HBox(20);
+        buttons.setAlignment(Pos.CENTER);
+
+        Button btnSave = new Button("Enregistrer");
+        btnSave.setStyle(
+                "-fx-background-color: #4CAF50;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 5;" +
+                        "-fx-padding: 5 15;"
+        );
+
+        Button btnCancel = new Button("Annuler");
+        btnCancel.setStyle(
+                "-fx-background-color: #ccc;" +
+                        "-fx-text-fill: #333;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 5;" +
+                        "-fx-padding: 5 15;"
+        );
+
+        buttons.getChildren().addAll(btnSave, btnCancel);
+
+        root.getChildren().addAll(title, fields, buttons);
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popupStage.setScene(scene);
+        popupStage.setResizable(false);
+
+        // Actions boutons
+        btnSave.setOnAction(ev -> {
+            try {
+                // Validation simple
+                String plate = plateField.getText().trim();
+                String owner = ownerField.getText().trim();
+                String durationStr = durationField.getText().trim();
+                if (plate.isEmpty() || owner.isEmpty() || durationStr.isEmpty()) return;
+
+                int duration = Integer.parseInt(durationStr);
+
+                // Mise à jour de la voiture
+                car.setPlate(plate);
+                car.setOwnerEmail(owner);
+                car.setDuration(duration);
+
+                carDAO.updateCar(car); // méthode DAO pour modifier la voiture
+                loadCars();
+                popupStage.close();
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        btnCancel.setOnAction(ev -> popupStage.close());
+
+        popupStage.showAndWait();
+    }
+    public void showDeleteCarPopup(Car car, CarDAO carDAO) {
+        Stage popupStage = new Stage();
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+
+        // Texte de confirmation
+        Label message = new Label("Voulez-vous vraiment supprimer cette voiture ?");
+        message.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+
+        // Boutons
+        Button yesBtn = new Button("Oui");
+        Button noBtn = new Button("Non");
+
+        yesBtn.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 5;");
+        noBtn.setStyle("-fx-background-color: #ccc; -fx-text-fill: black; -fx-padding: 8 20; -fx-background-radius: 5;");
+
+        HBox buttons = new HBox(10, yesBtn, noBtn);
+        buttons.setAlignment(Pos.CENTER);
+
+        VBox root = new VBox(15, message, buttons);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #ccc; -fx-border-radius: 10;");
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popupStage.setScene(scene);
+
+        // Action des boutons
+        yesBtn.setOnAction(e -> {
+            try {
+                carDAO.deleteCar(car.getId());
+                loadCars(); // recharge la liste des voitures
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
+                popupStage.close();
+            }
+        });
+
+        noBtn.setOnAction(e -> popupStage.close());
+
+        popupStage.showAndWait();
     }
 }

@@ -51,7 +51,7 @@ public class LoginController {
             if (user != null) {
                 Session.setUser(user);
                 loginMessage.setText("");
-                mainApp.showDashboard();
+                mainApp.showDashboard(Session.getUser());
             } else {
                 loginMessage.setText("Email ou mot de passe incorrect !");
             }

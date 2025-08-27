@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import models.User;
 
 import java.util.Objects;
 
@@ -86,8 +87,11 @@ public class MainApp extends Application {
         setRootWithTransition(registerRoot, true);
     }
 
-    public void showDashboard() {
+    public void showDashboard(User user) {
+        dashboardController.setUser(user);
         dashboardController.loadUser();
+        dashboardController.loadParkings();
+        dashboardController.loadCars();
         primaryStage.getScene().setRoot(dashboardRoot);
     }
 
