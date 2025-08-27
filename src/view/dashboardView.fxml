@@ -61,7 +61,7 @@
 
             <content>
                 <VBox spacing="10" fx:id="buttonContainer">
-                    <Button text="AAAAA"/>
+
                 </VBox>
             </content>
         </ScrollPane>

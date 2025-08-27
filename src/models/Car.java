@@ -3,16 +3,16 @@ package models;
 public class Car {
     private int id;
     private String plate;       // numéro d'immatriculation
-    private String owner;       // propriétaire
+    private String ownerEmail;       // propriétaire
     private int duration;       // durée de stationnement en minutes
     private int parkingId;      // id du parking associé
 
     public Car() {}
 
-    public Car(int id, int parkingId, String plate, String owner, int duration) {
+    public Car(int id, int parkingId, String plate, String ownerEmail, int duration) {
         this.id = id;
         this.plate = plate;
-        this.owner = owner;
+        this.ownerEmail = ownerEmail;
         this.duration = duration;
         this.parkingId = parkingId;
     }
@@ -24,8 +24,8 @@ public class Car {
     public String getPlate() { return plate; }
     public void setPlate(String plate) { this.plate = plate; }
 
-    public String getOwner() { return owner; }
-    public void setOwner(String owner) { this.owner = owner; }
+    public String getOwnerEmail() { return ownerEmail; }
+    public void setOwnerEmail(String ownerEmail) { this.ownerEmail = ownerEmail; }
 
     public int getDuration() { return duration; }
     public void setDuration(int duration) { this.duration = duration; }
@@ -35,6 +35,6 @@ public class Car {
 
     @Override
     public String toString() {
-        return plate + " (" + owner + ")";
+        return plate + " (" + ownerEmail + ")";
     }
 }

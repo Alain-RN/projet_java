@@ -57,7 +57,7 @@ public class AddParkingController {
             parking.setCapacity(Integer.parseInt(pCapacity));
 
             new ParkingDAO().addParking(parking);
-            dashboardController.reloadListParking();
+            dashboardController.reloadList();
 
             closeWindow();
         } catch (Exception e) {

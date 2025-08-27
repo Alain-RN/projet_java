@@ -14,22 +14,22 @@
       stylesheets="@/style/popup.css">
 
     <!-- Titre -->
-    <Label text="Ajouter une Voiture" styleClass="popup-title" fx:id="titleAddCar"/>
+    <Label text="Ajouter une Voiture" styleClass="popup-title" fx:id="titleAddCar" />
 
     <!-- Champs de saisie -->
-    <TextField fx:id="carPlateField" promptText="Numéro d'immatriculation"/>
-    <TextField fx:id="carOwnerField" promptText="Propriétaire"/>
+    <TextField fx:id="carPlateField" promptText="Numéro d'immatriculation" styleClass="text-field"/>
+    <TextField fx:id="carOwnerField" promptText="Propriétaire" styleClass="text-field"/>
 
     <!-- Temps de stationnement -->
     <HBox spacing="5" alignment="CENTER">
         <Button fx:id="decreaseTimeBtn" text="–" styleClass="time-btn" onAction="#decrTime"/>
-        <TextField fx:id="parkingTimeField" promptText="Durée (minutes)" styleClass="text-field"/>
+        <TextField fx:id="parkingTimeField" promptText="Durée (5 minutes)" styleClass="text-field"/>
         <Button fx:id="increaseTimeBtn" text="+" styleClass="time-btn" onAction="#incrTime"/>
     </HBox>
 
     <!-- Boutons -->
     <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
-        <Button text="Enregistrer" fx:id="saveBtn" styleClass="save-btn"/>
+        <Button text="Enregistrer" fx:id="saveBtn" styleClass="save-btn" onAction="#addCar"/>
         <Button text="Annuler" fx:id="cancelBtn" styleClass="cancel-btn"/>
     </HBox>
 </VBox>

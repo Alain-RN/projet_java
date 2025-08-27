@@ -91,6 +91,10 @@
     -fx-background-color: transparent;
 }
 
+#scrollCarList {
+    -fx-padding: 16 0 0 0;
+}
+
 
 .parking-data-header {
      -fx-padding : 20;

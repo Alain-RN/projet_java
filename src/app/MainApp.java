@@ -66,8 +66,8 @@ public class MainApp extends Application {
 
         // Définir taille minimale et maximale
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        stage.setMinWidth(800);
-        stage.setMinHeight(600);
+        stage.setMinWidth(1100);
+        stage.setMinHeight(700);
         stage.setMaxWidth(screenBounds.getWidth());
         stage.setMaxHeight(screenBounds.getHeight());
 
