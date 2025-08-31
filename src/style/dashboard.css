@@ -116,6 +116,14 @@
     -fx-background-radius: 12;
     -fx-padding:12;
     -fx-pref-width: 200;
+  }
+
+.data-block-text {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding:12;
 }
 
 

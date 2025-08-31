@@ -142,6 +142,14 @@
           spacing="20"
         >
         <HBox fx:id="parkingInformation" styleClass="parking-information" spacing="14">
+            <VBox fx:id="parkingInfo"
+                  styleClass="data-block-text"
+                  alignment="CENTER_LEFT"
+                  minWidth="200"
+            >
+                <Label text="Parking A" styleClass="number" fx:id="parkingName" style="-fx-font-size: 32" />
+                <Label text="📍 Antananarivo" styleClass="parking-information-label" fx:id="parkingLocation" />
+            </VBox>
             <VBox fx:id="parkingCapacity"
                   styleClass="data-block"
                   alignment="CENTER"

@@ -1,5 +1,8 @@
 package models;
 
+import java.util.List;
+import java.util.Objects;
+
 public class User {
     private int id;
     private String username;
@@ -31,5 +34,14 @@ public class User {
     @Override
     public String toString() {
         return username;
+    }
+
+    public boolean hasUserAddedCar(List<Car> parkingCars, String email) {
+        for (Car car : parkingCars) {
+            if (Objects.equals(car.getOwnerEmail(), email)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

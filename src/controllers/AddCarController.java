@@ -56,43 +56,56 @@ public class AddCarController {
 
     public void addCar() {
         String carPlate = carPlateField.getText().trim();
-        String duration = parkingTimeField.getText().trim();
+        String durationStr = parkingTimeField.getText().trim();
         String ownerEmail;
 
-        // Vérifie si l'utilisateur est admin
         boolean admin = isAdmin(dashboardController.getUser());
 
+        // Déterminer le propriétaire
         if (admin) {
             ownerEmail = carOwnerField.getText().trim();
-            carOwnerField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), ownerEmail.isEmpty());
+            carOwnerField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), ownerEmail.isEmpty() || !ownerEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$") );
         } else {
             ownerEmail = dashboardController.getUser().getEmail();
         }
 
         // Validation des champs
-        carPlateField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), carPlate.isEmpty());
-        parkingTimeField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), duration.isEmpty() || !isPositiveInteger(duration));
+        boolean invalidPlate = carPlate.isEmpty();
+        boolean invalidDuration = durationStr.isEmpty() || !isPositiveInteger(durationStr);
 
-        if (carPlate.isEmpty() || ownerEmail.isEmpty() || duration.isEmpty() || !isPositiveInteger(duration)) {
-            System.out.println("Tsy mety");
+        carPlateField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), invalidPlate);
+        parkingTimeField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), invalidDuration);
+
+        if ( invalidPlate || ownerEmail.isEmpty() || invalidDuration || !ownerEmail.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$") ) {
             return;
         }
 
-
         try {
+            CarDAO carDAO = new CarDAO();
+
             Car car = new Car();
             car.setPlate(carPlate);
-            car.setDuration(Integer.parseInt(duration));
+            car.setDuration(Integer.parseInt(durationStr));
             car.setOwnerEmail(ownerEmail);
             car.setParkingId(parkingId);
 
-            new CarDAO().addCar(car);
-            dashboardController.loadCars();
+            // Vérifie si la voiture peut être ajoutée
+            boolean added = carDAO.addCarIfValid(car, dashboardController.getUser());
+
+            if (!added) {
+                carPlateField.pseudoClassStateChanged(PseudoClass.getPseudoClass("error"), true);
+                return;
+            }
+
+            // Recharge la liste et ferme le popup
+            dashboardController.loadCars("");
             closeWindow();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     public boolean isPositiveInteger(String str) {
         if (str == null || str.isEmpty()) return false;

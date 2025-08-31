@@ -18,12 +18,12 @@
 
     <!-- Champs de saisie -->
     <TextField fx:id="carPlateField" promptText="Numéro d'immatriculation" styleClass="text-field"/>
-    <TextField fx:id="carOwnerField" promptText="Propriétaire" styleClass="text-field"/>
+    <TextField fx:id="carOwnerField" promptText="Email du propriétaire" styleClass="text-field"/>
 
     <!-- Temps de stationnement -->
     <HBox spacing="5" alignment="CENTER">
         <Button fx:id="decreaseTimeBtn" text="–" styleClass="time-btn" onAction="#decrTime"/>
-        <TextField fx:id="parkingTimeField" promptText="Durée (5 minutes)" styleClass="text-field"/>
+        <TextField fx:id="parkingTimeField" promptText="Durée (min: 5 minutes)" styleClass="text-field"/>
         <Button fx:id="increaseTimeBtn" text="+" styleClass="time-btn" onAction="#incrTime"/>
     </HBox>
 

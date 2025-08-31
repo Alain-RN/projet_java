@@ -90,8 +90,8 @@ public class MainApp extends Application {
     public void showDashboard(User user) {
         dashboardController.setUser(user);
         dashboardController.loadUser();
-        dashboardController.loadParkings();
-        dashboardController.loadCars();
+        dashboardController.loadParkings("");
+        dashboardController.loadCars("");
         primaryStage.getScene().setRoot(dashboardRoot);
     }
 

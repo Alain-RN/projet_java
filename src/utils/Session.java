@@ -20,4 +20,10 @@ public class Session {
     public static void clear() {
         currentUser = null;
     }
+
+    public static boolean isAdmin(User user) {
+        return "admin".equals(user.getUsername())
+                && "1234".equals(user.getPassword())
+                && user.getId() == 1;
+    }
 }

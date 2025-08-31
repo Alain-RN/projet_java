@@ -7,10 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -30,6 +27,7 @@ import dao.ParkingDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DashboardController {
@@ -39,6 +37,11 @@ public class DashboardController {
     public Label carNbr;
     public VBox listeCarContainer;
     public Button addCarBtn;
+    public TextField searchBar;
+    public TextField searchParking;
+    public VBox parkingData;
+    public Label parkingName;
+    public Label parkingLocation;
     private MainApp mainApp;
     private int parkingId;
     private User user;
@@ -56,12 +59,20 @@ public class DashboardController {
 
     public void initialize() {
         loadUser();
-        loadParkings();
-        loadCars();
+        loadParkings("");
+        loadCars("");
+
+        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+            loadCars(newValue);
+        });
+
+        searchParking.textProperty().addListener((observable, oldValue, newValue) -> {
+            loadParkings(newValue);
+        });
     }
 
     public void reloadList() {
-        loadParkings();
+        loadParkings("");
     }
 
     @FXML
@@ -155,34 +166,56 @@ public class DashboardController {
 
     public void logout() {
         Session.setUser(null);
+
+        buttonContainer.getChildren().clear();
+        listeCarContainer.getChildren().clear();
+        searchBar.setText("");
+
         mainApp.showLogin();
     }
 
-    public void loadParkings() {
+    public void loadParkings(String searchParking) {
         try {
+            CarDAO carDAO = new CarDAO();
             buttonContainer.getChildren().clear();
             ParkingDAO parkingDAO = new ParkingDAO();
             List<Parking> parkings = parkingDAO.getAllParkings();
 
-            if( !parkings.isEmpty() ) {
-                parkingId = parkings.get(0).getId();
-                loadCars();
-                parkingTmp = parkings.get(0);
-                showParkingDetails(parkings.get(0), totalCar);
+            // Filtrage par recherche (nom ou lieu)
+            if (searchParking != null && !searchParking.trim().isEmpty()) {
+                String searchLower = searchParking.toLowerCase();
+                parkings = parkings.stream()
+                        .filter(p -> p.getName().toLowerCase().contains(searchLower)
+                                || p.getLocation().toLowerCase().contains(searchLower)) // location = lieu
+                        .toList();
             }
 
-
+            if (!parkings.isEmpty()) {
+                parkingId = parkings.get(0).getId();
+                loadCars("");
+                parkingTmp = parkings.get(0);
+                showParkingDetails(parkingTmp, totalCar, carDAO.getCarsByParking(parkingId));
+                parkingName.setText(parkingTmp.getName());
+                parkingLocation.setText("📍 " + parkingTmp.getLocation());
+            }
 
             for (Parking parking : parkings) {
-                // Conteneur horizontal pour le nom + bouton delete
+                // Conteneur horizontal pour infos + bouton delete
                 HBox parkingRow = new HBox(10);
                 parkingRow.setAlignment(Pos.CENTER_LEFT);
                 parkingRow.setStyle("-fx-padding: 6 14 6 14; -fx-background-color: #f5f5f5; -fx-background-radius: 8;");
 
-                // Label du parking
+                // Label du parking (Nom + capacité)
                 Label parkingLabel = new Label(parking.getName() + " (" + parking.getCapacity() + " places)");
-                parkingLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #333; -fx-font-weight: bold;");
+                parkingLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #333; -fx-font-weight: bold;");
 
+                // Label du lieu
+                Label locationLabel = new Label("📍 " + parking.getLocation());
+                locationLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #555;");
+
+                // Regrouper Nom + Lieu dans une VBox
+                VBox parkingInfoBox = new VBox(2); // 2px d’espacement vertical
+                parkingInfoBox.getChildren().addAll(parkingLabel, locationLabel);
 
                 // Bouton delete avec image
                 Button deleteButton = new Button();
@@ -194,8 +227,8 @@ public class DashboardController {
                 );
 
                 ImageView deleteIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/delete.png")));
-                deleteIcon.setFitHeight(10);
-                deleteIcon.setFitWidth(10);
+                deleteIcon.setFitHeight(14);
+                deleteIcon.setFitWidth(14);
                 deleteButton.setGraphic(deleteIcon);
 
                 // Action clic sur bouton delete
@@ -203,22 +236,24 @@ public class DashboardController {
                     showDeleteParkingPopup(parking, parkingDAO);
                 });
 
-                // Clic sur le label = afficher détails
-                parkingLabel.setOnMouseClicked(e -> {
+                // Clic sur le nom ou lieu = afficher détails
+                parkingInfoBox.setOnMouseClicked(e -> {
                     parkingId = parking.getId();
                     parkingTmp = parking;
-                    loadCars();
-                    showParkingDetails(parking, totalCar);
+                    loadCars("");
+                    showParkingDetails(parking, totalCar, carDAO.getCarsByParking(parkingId));
+                    parkingName.setText(parking.getName());
+                    parkingLocation.setText("📍 " + parking.getLocation());
                 });
 
-                // Ajouter label + bouton à la ligne
+                // Ajouter infos + bouton à la ligne
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                if( user != null && isAdmin(user)) {
-                    parkingRow.getChildren().addAll(parkingLabel, spacer, deleteButton);
+                if (user != null && isAdmin(user)) {
+                    parkingRow.getChildren().addAll(parkingInfoBox, spacer, deleteButton);
                 } else {
-                    parkingRow.getChildren().addAll(parkingLabel, spacer);
+                    parkingRow.getChildren().addAll(parkingInfoBox, spacer);
                 }
 
                 // Ajouter la ligne dans le container
@@ -226,47 +261,75 @@ public class DashboardController {
             }
 
 
+            // Si aucun résultat
+            if (parkings.isEmpty()) {
+
+                Label emptyLabel = new Label("Aucun parking trouvé.");
+                emptyLabel.setMaxWidth(Double.MAX_VALUE);
+                emptyLabel.setAlignment(Pos.CENTER);
+                emptyLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 14px;");
+
+                buttonContainer.getChildren().add(emptyLabel);
+                parkingData.setVisible(false);
+                parkingData.setManaged(false);
+            } else {
+                parkingData.setVisible(true);
+                parkingData.setManaged(true);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void showParkingDetails(Parking parking, int totalCar) {
+    private void showParkingDetails(Parking parking, int totalCar, List<Car> car) {
         if(parking == null) {
             return;
         }
 
         capacity.setText(Integer.toString(parking.getCapacity()));
         carNbr.setText(Integer.toString(totalCar));
-        if (totalCar >= parking.getCapacity()) {
+        if ( getUser() != null &&
+                        ( totalCar >= parking.getCapacity() || getUser().hasUserAddedCar(car, getUser().getEmail()) )
+        ) {
             addCarBtn.setDisable(true);   // désactive le bouton
             addCarBtn.setText("Parking plein"); // facultatif, pour montrer visuellement
         } else {
             addCarBtn.setDisable(false);  // réactive le bouton
             addCarBtn.setText("Ajouter voiture");
         }
+
     }
 
-    public void loadCars() {
+    public void loadCars(String searchCar) {
         try {
             listeCarContainer.getChildren().clear();
             CarDAO carDAO = new CarDAO();
             List<Car> cars = carDAO.getCarsByParking(parkingId);
 
-            totalCar = cars.toArray().length;
+            // Filtrage si une recherche est présente
+            if (searchCar != null && !searchCar.isEmpty()) {
+                String query = searchCar.toLowerCase();
+                cars = cars.stream()
+                        .filter(car -> car.getPlate().toLowerCase().contains(query)
+                                || car.getOwnerEmail().toLowerCase().contains(query))
+                        .toList();
+            }
 
-            showParkingDetails(parkingTmp, totalCar);
+            totalCar = carDAO.getCarsByParking(parkingId).size();
+
+            showParkingDetails(parkingTmp, totalCar, carDAO.getCarsByParking(parkingId));
 
             if (cars.isEmpty()) {
                 Label emptyLabel = new Label("Aucune voiture dans ce parking.");
                 emptyLabel.setStyle(
-                                "-fx-text-fill: #888888; " +
+                        "-fx-text-fill: #888888; " +
                                 "-fx-font-size: 16px; " +
                                 "-fx-padding: 20;"
                 );
                 emptyLabel.setMaxWidth(Double.MAX_VALUE);
-                emptyLabel.setAlignment(Pos.CENTER); // centre le texte horizontalement
-                listeCarContainer.setAlignment(Pos.CENTER); // centre le contenu dans le VBox
+                emptyLabel.setAlignment(Pos.CENTER);
+                listeCarContainer.setAlignment(Pos.CENTER);
                 listeCarContainer.getChildren().add(emptyLabel);
                 return;
             }
@@ -275,48 +338,54 @@ public class DashboardController {
             for (Car car : cars) {
                 HBox carRow = new HBox();
                 carRow.setSpacing(10);
-                carRow.setStyle("-fx-padding: 10; -fx-background-color: #f5f5f5; -fx-background-radius: 8;");
+                if(car.isDurationElapsed()){
+                    carRow.setStyle("-fx-padding: 10 18; -fx-background-color: #FF7F7F; -fx-background-radius: 8;");
+                } else {
+                    carRow.setStyle("-fx-padding: 10 18; -fx-background-color: #f5f5f5; -fx-background-radius: 8;");
+                }
+
+                if( getUser() != null && Objects.equals( car.getOwnerEmail(), getUser().getEmail()) ) {
+                    addCarBtn.setDisable(true);
+                }
+
                 carRow.setAlignment(Pos.CENTER_LEFT);
 
-                // Plaque
                 Label plateLabel = new Label(car.getPlate());
                 plateLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14;");
                 plateLabel.setPrefWidth(150);
 
-                // Propriétaire
                 Label ownerLabel = new Label(car.getOwnerEmail());
                 ownerLabel.setPrefWidth(200);
 
-                // Durée
+                Label dateLabel = new Label(car.getAdded_time()+"");
+
                 Label durationLabel = new Label(car.getDuration() + " min");
                 durationLabel.setPrefWidth(100);
 
-                // Bouton Modifier
                 Button editBtn = new Button();
                 ImageView editIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/edit.png")));
                 editIcon.setFitWidth(20);
                 editIcon.setFitHeight(20);
                 editBtn.setGraphic(editIcon);
                 editBtn.setStyle("-fx-background-color: transparent;");
-                editBtn.setOnAction(e -> {
-                    showEditCarPopup(car, carDAO);
-                });
+                editBtn.setOnAction(e -> showEditCarPopup(car, carDAO));
 
-                // Bouton Supprimer
                 Button deleteBtn = new Button();
                 ImageView deleteIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/delete.png")));
                 deleteIcon.setFitWidth(14);
                 deleteIcon.setFitHeight(14);
                 deleteBtn.setGraphic(deleteIcon);
                 deleteBtn.setStyle("-fx-background-color: transparent;");
-                deleteBtn.setOnAction(e -> {
-                    showDeleteCarPopup(car, carDAO);
-                });
+                deleteBtn.setOnAction(e -> showDeleteCarPopup(car, carDAO));
 
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                carRow.getChildren().addAll(plateLabel, ownerLabel, durationLabel, spacer, editBtn, deleteBtn);
+                if (user != null && isAdmin(user)) {
+                    carRow.getChildren().addAll(plateLabel, ownerLabel, durationLabel, dateLabel, spacer, editBtn, deleteBtn);
+                } else {
+                    carRow.getChildren().addAll(plateLabel, ownerLabel, durationLabel,dateLabel, spacer);
+                }
 
                 listeCarContainer.getChildren().add(carRow);
             }
@@ -399,8 +468,8 @@ public class DashboardController {
         btnYes.setOnAction(ev -> {
             try {
                 parkingDAO.deleteParking(parking.getId());
-                loadParkings();
-                loadCars();
+                loadParkings("");
+                loadCars("");
                 popupStage.close();
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -427,7 +496,7 @@ public class DashboardController {
         VBox root = new VBox(15);
         root.setStyle(
                 "-fx-background-color: white;" +
-                        "-fx-padding: 20;" +
+                        "-fx-padding: 60 35;" +
                         "-fx-background-radius: 10;" +
                         "-fx-border-color: #ccc;" +
                         "-fx-border-radius: 10;" +
@@ -437,41 +506,68 @@ public class DashboardController {
         root.setAlignment(Pos.CENTER);
 
         Label title = new Label("Modifier la voiture");
-        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        title.setStyle("    -fx-font-size: 24px;\n" +
+                "    -fx-font-weight: bold;\n" +
+                "    -fx-text-fill: #2c3e50; /* gris foncé chic */\n" +
+                "    -fx-padding: 0 0 12 0;");
 
         // Champs
-        Label plateLabel = new Label("Plaque :");
         javafx.scene.control.TextField plateField = new javafx.scene.control.TextField(car.getPlate());
+        plateField.setPromptText("Numéro d'immatriculation");
+        plateField.setStyle(
+                        "    -fx-padding: 10px;\n" +
+                        "    -fx-font-size: 14px;\n" +
+                        "    -fx-background-radius: 8;\n" +
+                        "    -fx-border-radius: 8;\n" +
+                        "    -fx-border-color: #bdc3c7;\n" +
+                        "    -fx-background-color: white; -fx-pref-width: 270; -fx-pref-height: 36;\n"
+        );
 
-        Label ownerLabel = new Label("Propriétaire :");
         javafx.scene.control.TextField ownerField = new javafx.scene.control.TextField(car.getOwnerEmail());
+        ownerField.setPromptText("Email du propriétaire");
+        ownerField.setStyle(
+                        "    -fx-padding: 10px;\n" +
+                        "    -fx-font-size: 14px;\n" +
+                        "    -fx-background-radius: 8;\n" +
+                        "    -fx-border-radius: 8;\n" +
+                        "    -fx-border-color: #bdc3c7;\n" +
+                        "    -fx-background-color: white; -fx-pref-width: 270; -fx-pref-height: 36;\n "
+        );
 
-        Label durationLabel = new Label("Durée (min) :");
-        javafx.scene.control.TextField durationField = new javafx.scene.control.TextField(String.valueOf(car.getDuration()));
+        TextField durationField = new javafx.scene.control.TextField(String.valueOf(car.getDuration()));
+        durationField.setPromptText("Durée (min: 5 minutes)");
+        durationField.setStyle(
+                "    -fx-padding: 10px;\n" +
+                        "    -fx-font-size: 14px;\n" +
+                        "    -fx-background-radius: 8;\n" +
+                        "    -fx-border-radius: 8;\n" +
+                        "    -fx-border-color: #bdc3c7;\n" +
+                        "    -fx-background-color: white; -fx-pref-width: 270; -fx-pref-height: 36;\n "
+        );
 
-        VBox fields = new VBox(10, plateLabel, plateField, ownerLabel, ownerField, durationLabel, durationField);
+        VBox fields = new VBox(14, plateField, ownerField, durationField);
 
         fields.setMaxWidth(300);
 
-        HBox buttons = new HBox(20);
-        buttons.setAlignment(Pos.CENTER);
+        HBox buttons = new HBox(12);
+        buttons.setStyle("-fx-padding: 8 0 0 0;");
 
         Button btnSave = new Button("Enregistrer");
         btnSave.setStyle(
-                "-fx-background-color: #4CAF50;" +
+                "-fx-background-color: #3498db;" +
                         "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 5;" +
-                        "-fx-padding: 5 15;"
+                        "-fx-background-radius: 8;" +
+                        "-fx-padding: 10 26;"
         );
 
         Button btnCancel = new Button("Annuler");
         btnCancel.setStyle(
-                "-fx-background-color: #ccc;" +
-                        "-fx-text-fill: #333;" +
+                "-fx-background-color: gray;" +
+                        "-fx-text-fill: white;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 5;" +
-                        "-fx-padding: 5 15;"
+                        "-fx-background-radius: 8;" +
+                        "-fx-padding: 10 26;"
         );
 
         buttons.getChildren().addAll(btnSave, btnCancel);
@@ -490,7 +586,7 @@ public class DashboardController {
                 String plate = plateField.getText().trim();
                 String owner = ownerField.getText().trim();
                 String durationStr = durationField.getText().trim();
-                if (plate.isEmpty() || owner.isEmpty() || durationStr.isEmpty()) return;
+                if (plate.isEmpty() || owner.isEmpty() || !owner.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$") || durationStr.isEmpty()) return;
 
                 int duration = Integer.parseInt(durationStr);
 
@@ -500,7 +596,7 @@ public class DashboardController {
                 car.setDuration(duration);
 
                 carDAO.updateCar(car); // méthode DAO pour modifier la voiture
-                loadCars();
+                loadCars("");
                 popupStage.close();
             } catch (NumberFormatException ex) {
                 ex.printStackTrace();
@@ -542,7 +638,7 @@ public class DashboardController {
         yesBtn.setOnAction(e -> {
             try {
                 carDAO.deleteCar(car.getId());
-                loadCars(); // recharge la liste des voitures
+                loadCars(""); // recharge la liste des voitures
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
